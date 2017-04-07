@@ -1,0 +1,10 @@
+.vs/
+GameStatRestfullAPI/bin/
+packages/
+GameStatRestfullAPI/obj/
+DataSpammer/obj/
+DataSpammer/bin/
+Tests/bin/
+Tests/obj/
+MyClient/bin/
+MyClient/obj/
