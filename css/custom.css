@@ -1,0 +1,49 @@
+.container-fluid {
+    max-width: 500px;
+    margin: 60px auto;
+    border: 1px solid #e0e0e0;
+    padding-top: 20px;
+}
+
+.keyboard a {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background-color: #F2F2F2;
+    padding: 20px 0;
+    font-weight: bold;
+    border: 0;
+}
+
+.keyboard div {
+    padding: 0;
+}
+
+.keyboard a:hover {
+    background-color: #DADADA;
+}
+
+.keyboard a:active {
+    background-color: #C2C2C2;
+}
+
+#curr-number {
+    text-align: right;
+    font-size: 32px;
+    padding-right: 10px;
+    margin: 10px auto;
+}
+
+#history {
+    text-align: right;
+    font-size: 16px;
+    padding-right: 10px;
+    margin: 10px auto;
+
+}
+
+#label {
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 10px;
+}
