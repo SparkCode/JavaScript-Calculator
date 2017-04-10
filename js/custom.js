@@ -1,4 +1,4 @@
-function Memory(element) {
+function HistoryInput(element) {
     Object.defineProperty(this, "currentMathExpression", {get: function () {
         return element.innerText.toString();
     }, set: function (val) {
@@ -20,7 +20,7 @@ function Memory(element) {
     };
 }
 
-function Input(element) {
+function CurrentInput(element) {
     var currentTyping = "0";
 
     Object.defineProperty(this, "currentTyping", {get: function () {
@@ -34,14 +34,16 @@ function Input(element) {
     Object.defineProperty(this, "currentTempResult", {set: function (value) {
         this.isTempResult = true;
         element.innerText = value;
+    }, get: function () {
+        return element.innerText;
     }});
 
     this.addDigit = function (digit) {
         this.currentTyping = this.currentTyping === "0" ? digit :  this.currentTyping + digit;
     };
 
-    this.changeSign = function () { //todo
-        this.currentTyping *= -1;
+    this.changeSign = function () {
+        this.currentTyping = this.isTempResult ? this.currentTempResult * -1 : this.currentTyping * -1;
     };
 
     this.addPoint = function () {
@@ -99,51 +101,26 @@ function CustomMath(value, op) {
 }
 
 function Calculator(inputElement, memoryElement) {
-
-}
-
-
-
-
-$(document).ready(function () {
-    var input = new Input($("#curr-number").first()[0]);
-    var memory = new Memory($("#history").first()[0]);
+    var input = new CurrentInput(inputElement);
+    var memory = new HistoryInput(memoryElement);
     var result;
 
-    $("[data-operation-name='digit-adding']").click(function () {
-        var digit = this.innerHTML;
-        input.addDigit(digit);
-    });
+    this.addDigit = input.addDigit.bind(input);
+    this.deleteChar = input.deleteChar.bind(input);
+    this.changeSign = input.changeSign.bind(input);
+    this.addPoint = input.addPoint.bind(input);
+    this.deleteChar = input.deleteChar.bind(input);
+    this.deleteInputAll = input.deleteAll.bind(input);
 
-    $("[data-operation-name='char-deleter']").click(function () {
-        input.deleteChar();
-    });
-
-    $("[data-operation-name='sign-changer']").click(function () {
-        input.changeSign();
-    });
-
-    $("[data-operation-name='point-adder']").click(function () {
-        input.addPoint();
-    });
-
-    $("[data-operation-name='input-char-deleter']").click(function () {
-        input.deleteChar();
-    });
-
-    $("[data-operation-name='input-deleter']").click(function () {
-        input.deleteAll();
-    });
-
-    $("[data-operation-name='input-and-memory-deleter']").click(function () {
+    this.deleteAll = function () {
         input.deleteAll();
         memory.deleteAll();
         result = null;
-    });
+    };
 
-    $("[data-operation-name='operation']").click(function () {
-        var operationName = this.getAttribute("data-value");
-        var operationIcon = this.innerHTML;
+    this.makeOperation = function (element) {
+        var operationName = element.getAttribute("data-value");
+        var operationIcon = element.innerHTML;
 
         if (input.isTempResult === true)
         {
@@ -153,7 +130,6 @@ $(document).ready(function () {
         }
 
         var currTypingNumber = input.getNumber();
-
 
         memory.addOperation(currTypingNumber, operationIcon);
 
@@ -167,16 +143,56 @@ $(document).ready(function () {
             var currRes = result.makeOperation(operationName, currTypingNumber);
             input.showTempResult(currRes);
         }
-    });
+    };
 
-    $("[data-operation-name='result-getter']").click(function () {
+    this.makeResult = function () {
         if (result === null || input.isTempResult === true)
             return;
         var currTypingNumber = input.getNumber();
         var currRes = result.makeOperation("", currTypingNumber);
         input.showResult(currRes);
         memory.deleteAll();
-
         result = null;
+    }
+}
+
+$(document).ready(function () {
+    var calc = new Calculator($("#curr-number").first()[0], $("#history").first()[0]);
+
+    $("[data-operation-name='digit-adding']").click(function () {
+        var digit = this.innerHTML;
+        calc.addDigit(digit);
+    });
+
+    $("[data-operation-name='char-deleter']").click(function () {
+        calc.deleteChar();
+    });
+
+    $("[data-operation-name='sign-changer']").click(function () {
+        calc.changeSign();
+    });
+
+    $("[data-operation-name='point-adder']").click(function () {
+        calc.addPoint();
+    });
+
+    $("[data-operation-name='input-char-deleter']").click(function () {
+        calc.deleteChar();
+    });
+
+    $("[data-operation-name='input-deleter']").click(function () {
+        calc.deleteInputAll();
+    });
+
+    $("[data-operation-name='input-and-memory-deleter']").click(function () {
+        calc.deleteAll();
+    });
+
+    $("[data-operation-name='operation']").click(function () {
+        calc.makeOperation(this);
+    });
+
+    $("[data-operation-name='result-getter']").click(function () {
+        calc.makeResult();
     });
 });
